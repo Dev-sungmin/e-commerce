@@ -1,0 +1,100 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check backend paths
+        id: check
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'common/**'
+              - 'gateway/**'
+              - 'user-service/**'
+              - 'order-service/**'
+              - 'payment-service/**'
+              - 'review-service/**'
+              - 'build.gradle'
+              - 'settings.gradle'
+
+      - name: Set up JDK 17
+        if: steps.check.outputs.backend == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        if: steps.check.outputs.backend == 'true'
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        if: steps.check.outputs.backend == 'true'
+        run: ./gradlew build -x test
+
+  build-php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check php path
+        id: check
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            php:
+              - 'php-legacy/**'
+
+      - name: Set up PHP
+        if: steps.check.outputs.php == 'true'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Lint PHP files
+        if: steps.check.outputs.php == 'true'
+        run: find php-legacy/src -name "*.php" -exec php -l {} \;
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check frontend path
+        id: check
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+
+      - name: Set up Node
+        if: steps.check.outputs.frontend == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        if: steps.check.outputs.frontend == 'true'
+        working-directory: frontend
+        run: npm ci
+
+      - name: Lint
+        if: steps.check.outputs.frontend == 'true'
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Build
+        if: steps.check.outputs.frontend == 'true'
+        working-directory: frontend
+        run: npm run build
