@@ -1,4 +1,6 @@
 package com.example.user_service.dto;
 
-public class TokenResponse {
-}
+public record TokenResponse(
+        String accessToken,
+        String refreshToken
+) {}

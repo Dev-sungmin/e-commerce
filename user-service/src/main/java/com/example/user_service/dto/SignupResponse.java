@@ -1,4 +1,3 @@
 package com.example.user_service.dto;
 
-public class SignupResponse {
-}
+public record SignupResponse(Long userId, String email, String role) {}
