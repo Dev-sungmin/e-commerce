@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 // TODO: PHP 상품 API 완성되면 features/products/pages/ProductListPage.jsx로 교체하고 이 파일은 삭제
 export default function AuthCheckPage() {
