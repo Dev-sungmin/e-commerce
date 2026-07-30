@@ -25,4 +25,8 @@ subprojects {
             mavenBom "org.springframework.boot:spring-boot-dependencies:3.3.4"
         }
     }
+
+    tasks.named('jar'){
+        enabled = false
+    }
 }
