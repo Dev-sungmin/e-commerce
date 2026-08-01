@@ -4,6 +4,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       USER_SERVICE_DB_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
+      LEGACY_SHOP_DB_PASSWORD: ${LEGACY_SHOP_DB_PASSWORD}
     ports:
       - "3306:3306"
     healthcheck:
@@ -25,6 +26,21 @@ services:
       JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  php-legacy:
+    build:
+      context: .
+      dockerfile: php-legacy/Dockerfile
+    environment:
+      DB_HOST: mysql
+      DB_NAME: legacy_shop
+      DB_USERNAME: legacy_shop_service
+      DB_PASSWORD: ${LEGACY_SHOP_DB_PASSWORD}
+    ports:
+      - "8090:80"
     depends_on:
       mysql:
         condition: service_healthy
