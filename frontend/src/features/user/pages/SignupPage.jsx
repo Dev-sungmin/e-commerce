@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '../api/authApi';
+import '../styles/auth.css';
 
 export default function SignupPage() {
     const [email, setEmail] = useState('');
