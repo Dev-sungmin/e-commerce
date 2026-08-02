@@ -1,0 +1,9 @@
+import phpClient from "../../../api/phpClient.js";
+
+export const productApi = {
+    getList: (params) =>
+        phpClient.get('/api/products.php', { params }),
+
+    getById: (id) =>
+        phpClient.get('/api/products.php', { params: { id } }),
+};
