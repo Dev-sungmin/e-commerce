@@ -44,7 +44,8 @@ mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" <<-EOSQL
         id             BIGINT AUTO_INCREMENT PRIMARY KEY,
         name           VARCHAR(255) NOT NULL,
         price          INT NOT NULL,
-        stock_quantity INT NOT NULL DEFAULT 0
+        stock_quantity INT NOT NULL DEFAULT 0,
+        image_url      VARCHAR(500) DEFAULT NULL
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
     CREATE TABLE IF NOT EXISTS inventory_log (
@@ -58,8 +59,8 @@ mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" <<-EOSQL
         INDEX idx_product_id (product_id)
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-    INSERT INTO inventory (name, price, stock_quantity) VALUES
-        ('아메리카노', 3500, 50),
-        ('카페라떼', 4000, 30),
-        ('에스프레소', 3000, 20);
+    INSERT INTO inventory (name, price, stock_quantity, image_url) VALUES
+        ('아메리카노', 3500, 50, 'https://e-commerce-product-images-sungmin2026.s3.ap-northeast-2.amazonaws.com/americano.jpg'),
+        ('카페라떼', 4000, 30, 'https://e-commerce-product-images-sungmin2026.s3.ap-northeast-2.amazonaws.com/cafelatte.jpg'),
+        ('에스프레소', 3000, 20, 'https://e-commerce-product-images-sungmin2026.s3.ap-northeast-2.amazonaws.com/espresso.jpg');
 EOSQL
