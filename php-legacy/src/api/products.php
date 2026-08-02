@@ -1,5 +1,6 @@
 <?php
 // 외부 공개 API - GET /api/products (목록, 페이지네이션/검색/가격필터), GET /api/products?id=1 (단건)
+require_once __DIR__ . '/../cors.php';
 require_once __DIR__ . '/../db.php';
 /** @var PDO $pdo */
 
@@ -21,7 +22,7 @@ if ($id !== null) {
 
 function fetchSingleProduct(PDO $pdo, int $id): void
 {
-    $stmt = $pdo->prepare("SELECT id, name, price, stock_quantity FROM inventory WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, name, price, stock_quantity, image_url FROM inventory WHERE id = ?");
     $stmt->execute([$id]);
     $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -69,7 +70,7 @@ function fetchProductList(PDO $pdo): void
 
     // 목록 조회 (LIMIT/OFFSET은 bindValue로 정수 타입 강제)
     $stmt = $pdo->prepare(
-        "SELECT id, name, price, stock_quantity FROM inventory {$whereClause} ORDER BY id LIMIT ? OFFSET ?"
+        "SELECT id, name, price, stock_quantity, image_url FROM inventory {$whereClause} ORDER BY id LIMIT ? OFFSET ?"
     );
     $paramIndex = 1;
     foreach ($params as $param) {
@@ -96,5 +97,6 @@ function toCamelCase(array $row): array
         'name' => $row['name'],
         'price' => (int)$row['price'],
         'stockQuantity' => (int)$row['stock_quantity'],
+        'imageUrl' => $row['image_url'],
     ];
 }
