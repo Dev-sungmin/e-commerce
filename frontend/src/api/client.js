@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const client = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE,
+    baseURL: import.meta.env.VITE_API_BASE,  // 이제 Gateway 주소
     withCredentials: true,
 });
 
@@ -28,14 +28,14 @@ client.interceptors.response.use(
     async (error) => {
         const original = error.config;
 
-        if (original.url === '/auth/refresh') {
+        if (original.url === '/api/auth/refresh') {
             return Promise.reject(error);
         }
 
         if (error.response?.status === 401 && !original._retry) {
             original._retry = true;
             try {
-                const res = await client.post('/auth/refresh', {}, { withCredentials: true })
+                const res = await client.post('/api/auth/refresh', {}, { withCredentials: true });
                 setAccessToken(res.data.accessToken);
                 original.headers.Authorization = `Bearer ${res.data.accessToken}`;
                 return client(original);

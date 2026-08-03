@@ -1,4 +1,4 @@
-import phpClient from "../../../api/phpClient.js";
+import phpClient from "../../../api/client.js";
 
 export const productApi = {
     getList: (params) =>
