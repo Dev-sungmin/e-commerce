@@ -1,3 +1,22 @@
+server:
+  port: 8000
+
 spring:
   application:
     name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://user-service:8080
+          predicates:
+            - Path=/api/auth/**
+
+        - id: product-service
+          uri: http://php-legacy:80
+          predicates:
+            - Path=/api/products.php
+
+
+jwt:
+  secret: ${JWT_SECRET:local-dev-secret-change-me-must-be-long-enough}
