@@ -1,7 +1,6 @@
 <?php
 // 내부 전용 API - Order Service만 호출. Gateway 라우팅 대상 아님.
 // 외부 직접 노출 금지 (Gateway 완성 후 보안그룹에서 PHP 8080 포트 접근 제한 예정)
-require_once __DIR__ . '/../cors.php';
 require_once __DIR__ . '/../db.php';
 /** @var PDO $pdo */
 
