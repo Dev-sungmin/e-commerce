@@ -17,6 +17,5 @@ spring:
           predicates:
             - Path=/api/products.php
 
-
 jwt:
   secret: ${JWT_SECRET:local-dev-secret-change-me-must-be-long-enough}
