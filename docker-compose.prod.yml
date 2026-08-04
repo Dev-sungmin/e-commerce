@@ -5,6 +5,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       USER_SERVICE_DB_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
       LEGACY_SHOP_DB_PASSWORD: ${LEGACY_SHOP_DB_PASSWORD}
+      ORDER_SERVICE_DB_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
     ports:
       - "3306:3306"
     healthcheck:
@@ -15,6 +16,16 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./db-init:/docker-entrypoint-initdb.d
+
+  gateway:
+    image: ${ECR_REGISTRY}/e-commerce-gateway:latest
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - user-service
+      - php-legacy
 
   user-service:
     image: ${ECR_REGISTRY}/e-commerce-user-service:latest
@@ -28,16 +39,6 @@ services:
       mysql:
         condition: service_healthy
 
-  gateway:
-    image: ${ECR_REGISTRY}/e-commerce-gateway:latest
-    environment:
-      JWT_SECRET: ${JWT_SECRET}
-    ports:
-      - "8000:8000"
-    depends_on:
-      - user-service
-      - php-legacy
-
   php-legacy:
     image: ${ECR_REGISTRY}/e-commerce-php-legacy:latest
     environment:
@@ -50,6 +51,18 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+
+  order-service:
+    image: ${ECR_REGISTRY}/e-commerce-order-service:latest
+    environment:
+      DB_USERNAME: ${ORDER_SERVICE_DB_USERNAME}
+      DB_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
 
 volumes:
   mysql-data:
