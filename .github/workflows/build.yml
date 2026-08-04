@@ -133,5 +133,5 @@ jobs:
 
       - name: Build and push php-legacy
         run: |
-          docker build -t ${{ secrets.ECR_REGISTRY }}/e-commerce-php-legacy:latest ./php-legacy
+          docker build -f php-legacy/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-php-legacy:latest .
           docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-php-legacy:latest
