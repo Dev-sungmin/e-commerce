@@ -5,6 +5,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       USER_SERVICE_DB_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
       LEGACY_SHOP_DB_PASSWORD: ${LEGACY_SHOP_DB_PASSWORD}
+      ORDER_SERVICE_DB_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
     ports:
       - "3306:3306"
     healthcheck:
@@ -41,6 +42,19 @@ services:
       DB_PASSWORD: ${LEGACY_SHOP_DB_PASSWORD}
     ports:
       - "8090:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    environment:
+      DB_USERNAME: ${ORDER_SERVICE_DB_USERNAME}
+      DB_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
+    ports:
+      - "8081:8081"
     depends_on:
       mysql:
         condition: service_healthy
