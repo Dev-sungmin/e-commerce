@@ -1,3 +1,35 @@
+server:
+  port: 8081
+
 spring:
   application:
     name: order-service
+  datasource:
+    url: jdbc:mysql://mysql:3306/new_order
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+php:
+  base-url: ${PHP_BASE_URL:http://php-legacy:80}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      phpInventoryService:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        ignore-exceptions:
+          - com.example.order_service.exception.InsufficientStockException
+    order: 2
+  bulkhead:
+    instances:
+      phpInventoryService:
+        max-concurrent-calls: 20
+        max-wait-duration: 2s
+    order: 1
