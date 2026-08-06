@@ -26,6 +26,8 @@ services:
     depends_on:
       - user-service
       - php-legacy
+      - order-service
+      - cart-service
 
   user-service:
     image: ${ECR_REGISTRY}/e-commerce-user-service:latest
@@ -63,6 +65,30 @@ services:
       mysql:
         condition: service_healthy
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  cart-service:
+    image: ${ECR_REGISTRY}/e-commerce-cart-service:latest
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "8082:8082"
+    depends_on:
+      redis:
+        condition: service_healthy
+
 
 volumes:
   mysql-data:
+  redis-data:
