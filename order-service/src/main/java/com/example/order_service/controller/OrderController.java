@@ -36,7 +36,7 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getOrder(@PathVariable String id) {
-        Optional<Order> order = orderRepository.findById(id);
+        Optional<Order> order = orderRepository.findWithItemsById(id);
 
         if (order.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -48,7 +48,7 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<List<OrderResponse>> getMyOrders(@RequestHeader("X-User-Id") Long userId) {
-        List<Order> orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<Order> orders = orderRepository.findWithItemsByUserIdOrderByCreatedAtDesc(userId);
         List<OrderResponse> response = orders.stream().map(OrderResponse::from).toList();
         return ResponseEntity.ok(response);
     }
