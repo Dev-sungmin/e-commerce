@@ -22,5 +22,10 @@ spring:
           predicates:
             - Path=/api/orders/**
 
+        - id: cart-service
+          uri: http://cart-service:8082
+          predicates:
+            - Path=/api/cart/**
+
 jwt:
   secret: ${JWT_SECRET:local-dev-secret-change-me-must-be-long-enough}
