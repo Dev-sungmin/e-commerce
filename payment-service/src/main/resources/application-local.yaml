@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/new_payment
+
+order:
+  base-url: http://localhost:8081

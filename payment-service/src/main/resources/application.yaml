@@ -1,3 +1,21 @@
+server:
+  port: 8083
+
 spring:
   application:
     name: payment-service
+  datasource:
+    url: jdbc:mysql://mysql:3306/new_payment
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+toss:
+  secret-key: ${TOSS_SECRET_KEY}
+  confirm-url: https://api.tosspayments.com/v1/payments/confirm
+
+order:
+  base-url: ${ORDER_BASE_URL:http://order-service:8081}

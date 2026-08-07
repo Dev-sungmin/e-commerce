@@ -6,6 +6,7 @@ services:
       USER_SERVICE_DB_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
       LEGACY_SHOP_DB_PASSWORD: ${LEGACY_SHOP_DB_PASSWORD}
       ORDER_SERVICE_DB_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
+      PAYMENT_SERVICE_DB_PASSWORD: ${PAYMENT_SERVICE_DB_PASSWORD}
     ports:
       - "3306:3306"
     healthcheck:
@@ -28,6 +29,7 @@ services:
       - php-legacy
       - order-service
       - cart-service
+      - payment-service
 
   user-service:
     image: ${ECR_REGISTRY}/e-commerce-user-service:latest
@@ -88,6 +90,17 @@ services:
       redis:
         condition: service_healthy
 
+  payment-service:
+    image: ${ECR_REGISTRY}/e-commerce-payment-service:latest
+    environment:
+      DB_USERNAME: ${PAYMENT_SERVICE_DB_USERNAME}
+      DB_PASSWORD: ${PAYMENT_SERVICE_DB_PASSWORD}
+      TOSS_SECRET_KEY: ${TOSS_SECRET_KEY}
+    ports:
+      - "8083:8083"
+    depends_on:
+      mysql:
+        condition: service_healthy
 
 volumes:
   mysql-data:
