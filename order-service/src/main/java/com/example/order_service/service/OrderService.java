@@ -39,7 +39,7 @@ public class OrderService {
                         orderId, itemRequest.productId(), itemRequest.quantity()
                 );
                 // 성공한 것만 기록해둠 - 나중에 실패 시 이 목록을 역순으로 되돌림
-                deducted.add(new DeductedItem(itemRequest.productId(), itemRequest.quantity(), itemRequest.productName(), itemRequest.price()));
+                deducted.add(new DeductedItem(itemRequest.productId(), itemRequest.quantity(), result.productName(), result.price()));
             }
         } catch (InsufficientStockException e) {
             // 보상 트랜잭션: 이미 차감된 것들을 역순으로 복구

@@ -36,14 +36,12 @@ if ($action === 'deduct') {
 
 function handleDeduct(PDO $pdo, string $orderId, int $productId, int $quantity): void
 {
-    // 원자적 조건부 UPDATE - 별도 락/버전 컬럼 없이 한 문장으로 체크+차감
     $stmt = $pdo->prepare(
         "UPDATE inventory SET stock_quantity = stock_quantity - ? WHERE id = ? AND stock_quantity >= ?"
     );
     $stmt->execute([$quantity, $productId, $quantity]);
 
     if ($stmt->rowCount() === 0) {
-        // 상품 자체가 없는 것인지, 재고가 부족한 것인지 구분
         $checkStmt = $pdo->prepare("SELECT stock_quantity FROM inventory WHERE id = ?");
         $checkStmt->execute([$productId]);
         $current = $checkStmt->fetchColumn();
@@ -64,11 +62,17 @@ function handleDeduct(PDO $pdo, string $orderId, int $productId, int $quantity):
     );
     $logStmt->execute([$productId, $orderId, -$quantity]);
 
-    $remainingStmt = $pdo->prepare("SELECT stock_quantity FROM inventory WHERE id = ?");
+    // name, price도 같이 조회 (Order Service가 주문 스냅샷을 만들 때 씀)
+    $remainingStmt = $pdo->prepare("SELECT name, price, stock_quantity FROM inventory WHERE id = ?");
     $remainingStmt->execute([$productId]);
-    $remaining = (int)$remainingStmt->fetchColumn();
+    $product = $remainingStmt->fetch(PDO::FETCH_ASSOC);
 
-    echo json_encode(['success' => true, 'remainingStock' => $remaining]);
+    echo json_encode([
+        'success' => true,
+        'remainingStock' => (int)$product['stock_quantity'],
+        'productName' => $product['name'],
+        'price' => (int)$product['price'],
+    ]);
 }
 
 function handleRestore(PDO $pdo, string $orderId, int $productId, int $quantity): void
