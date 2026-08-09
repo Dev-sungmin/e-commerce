@@ -100,9 +100,6 @@ export default function ProductListPage() {
                                 <div style={{ padding: 16 }}>
                                     <p style={{ fontWeight: 600, margin: '0 0 6px' }}>{p.name}</p>
                                     <p style={{ margin: '0 0 6px' }}>{p.price.toLocaleString()}원</p>
-                                    <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
-                                        재고 {p.stockQuantity}개
-                                    </p>
                                 </div>
                             </div>
                         </Link>
