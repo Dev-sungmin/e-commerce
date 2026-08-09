@@ -6,4 +6,7 @@ export const productApi = {
 
     getById: (id) =>
         phpClient.get('/api/products.php', { params: { id } }),
+
+    getByIds: (ids) =>
+        phpClient.get('/api/products.php', { params: { ids: ids.join(','), size: 100 } }),
 };
