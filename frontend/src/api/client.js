@@ -1,19 +1,19 @@
 import axios from 'axios';
 
 const client = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE,  // 이제 Gateway 주소
+    baseURL: import.meta.env.VITE_API_BASE,
     withCredentials: true,
 });
 
 let accessToken = null;
-let onLogout = null;
+let logoutCallbacks = [];
 
 export function setAccessToken(token) {
     accessToken = token;
 }
 
-export function setOnLogout(callback) {
-    onLogout = callback;
+export function addOnLogout(callback) {
+    logoutCallbacks.push(callback);
 }
 
 client.interceptors.request.use((config) => {
@@ -41,7 +41,7 @@ client.interceptors.response.use(
                 return client(original);
             } catch (refreshError) {
                 setAccessToken(null);
-                if (onLogout) onLogout();
+                logoutCallbacks.forEach((cb) => cb());
                 return Promise.reject(refreshError);
             }
         }
