@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './features/user/context/AuthContext';
 import { CartProvider } from './features/cart/context/CartContext';
 import { CartSync } from './features/cart/context/CartSync';
+import MainLayout from './components/MainLayout';
 import LoginPage from './features/user/pages/LoginPage';
 import SignupPage from './features/user/pages/SignupPage';
 import ProductListPage from './features/products/pages/ProductListPage';
@@ -15,9 +16,11 @@ function App() {
                 <CartSync />
                 <BrowserRouter>
                     <Routes>
-                        <Route path="/" element={<ProductListPage />} />
-                        <Route path="/products/:id" element={<ProductDetailPage />} />
-                        <Route path="/cart" element={<CartPage />} />
+                        <Route element={<MainLayout />}>
+                            <Route path="/" element={<ProductListPage />} />
+                            <Route path="/products/:id" element={<ProductDetailPage />} />
+                            <Route path="/cart" element={<CartPage />} />
+                        </Route>
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/signup" element={<SignupPage />} />
                     </Routes>

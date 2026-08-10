@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { productApi } from '../api/productApi';
-import { useAuth } from '../../user/hooks/useAuth';
 import '../styles/products.css';
 
 export default function ProductListPage() {
-    const { user, logout } = useAuth();
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -42,21 +40,6 @@ export default function ProductListPage() {
 
     return (
         <div>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px' }}>
-                <h1 style={{ fontSize: 18, margin: 0 }}>쇼핑몰</h1>
-                {user ? (
-                    <div>
-                        <span>{user.email}님</span>
-                        <button onClick={logout} style={{ marginLeft: 12 }}>로그아웃</button>
-                    </div>
-                ) : (
-                    <div>
-                        <Link to="/login">로그인</Link>
-                        <Link to="/signup" style={{ marginLeft: 12 }}>회원가입</Link>
-                    </div>
-                )}
-            </header>
-
             <form onSubmit={handleSearch} style={{ padding: '0 24px', display: 'flex', gap: 8 }}>
                 <input
                     value={keyword}
