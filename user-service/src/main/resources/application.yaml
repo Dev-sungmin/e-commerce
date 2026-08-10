@@ -1,15 +1,10 @@
 spring:
   application:
     name: user-service
-  datasource:
-    url: jdbc:mysql://mysql:3306/user_db
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:root}
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: true
 
 jwt:
-  secret: ${JWT_SECRET:change-me-in-production-must-be-long-enough-for-hamc}
   access-token-expiry-seconds: 3600

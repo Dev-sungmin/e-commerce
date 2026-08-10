@@ -9,11 +9,13 @@ import com.example.user_service.exception.InvalidRefreshTokenException;
 import com.example.user_service.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.Duration;
 import java.util.Map;
 
@@ -21,6 +23,12 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
+
+    @Value("${cookie.same-site}")
+    private String sameSite;
+
+    @Value("${cookie.secure}")
+    private boolean secure;
 
     public AuthController(AuthService authService) {
         this.authService = authService;
@@ -36,16 +44,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         TokenResponse tokens = authService.login(request.email(), request.password());
-
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", tokens.refreshToken())
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .path("/auth")
-                .maxAge(Duration.ofDays(7))
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
+        response.addHeader(HttpHeaders.SET_COOKIE, buildCookie(tokens.refreshToken(), Duration.ofDays(7)).toString());
         return ResponseEntity.ok(Map.of("accessToken", tokens.accessToken()));
     }
 
@@ -56,14 +55,9 @@ public class AuthController {
 
         if (refreshTokenValue == null) {
             throw new InvalidRefreshTokenException();
-    }
+        }
         TokenResponse tokens = authService.refresh(refreshTokenValue);
-
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", tokens.refreshToken())
-                .httpOnly(true).secure(true).sameSite("Strict").path("/auth")
-                .maxAge(Duration.ofDays(7)).build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
+        response.addHeader(HttpHeaders.SET_COOKIE, buildCookie(tokens.refreshToken(), Duration.ofDays(7)).toString());
         return ResponseEntity.ok(Map.of("accessToken", tokens.accessToken()));
     }
 
@@ -74,13 +68,17 @@ public class AuthController {
         if (refreshTokenValue != null) {
             authService.logout(refreshTokenValue);
         }
-
-        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true).secure(true).sameSite("Strict").path("/auth")
-                .maxAge(0).build();
-        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
-
+        response.addHeader(HttpHeaders.SET_COOKIE, buildCookie("", Duration.ZERO).toString());
         return ResponseEntity.noContent().build();
     }
 
+    private ResponseCookie buildCookie(String value, Duration maxAge) {
+        return ResponseCookie.from("refreshToken", value)
+                .httpOnly(true)
+                .secure(secure)
+                .sameSite(sameSite)
+                .path("/")
+                .maxAge(maxAge)
+                .build();
+    }
 }

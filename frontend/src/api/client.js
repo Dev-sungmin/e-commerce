@@ -7,6 +7,7 @@ const client = axios.create({
 
 let accessToken = null;
 let logoutCallbacks = [];
+let refreshCallbacks = [];
 
 export function setAccessToken(token) {
     accessToken = token;
@@ -14,6 +15,10 @@ export function setAccessToken(token) {
 
 export function addOnLogout(callback) {
     logoutCallbacks.push(callback);
+}
+
+export function addOnRefresh(callback) {
+    refreshCallbacks.push(callback);
 }
 
 client.interceptors.request.use((config) => {
@@ -37,6 +42,7 @@ client.interceptors.response.use(
             try {
                 const res = await client.post('/api/auth/refresh', {}, { withCredentials: true });
                 setAccessToken(res.data.accessToken);
+                refreshCallbacks.forEach((cb) => cb(res.data.accessToken));
                 original.headers.Authorization = `Bearer ${res.data.accessToken}`;
                 return client(original);
             } catch (refreshError) {
