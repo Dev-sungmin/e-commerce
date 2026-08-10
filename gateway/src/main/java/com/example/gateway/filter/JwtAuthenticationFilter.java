@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getURI().getPath();
 
         // 인증이 필요 없는 경로는 그냥 통과
-        if (path.startsWith("/api/auth") || path.startsWith("/api/products")) {
+        if (path.startsWith("/api/auth") || path.startsWith("/api/products") || path.equals("/api/payments/confirm")) {
             return chain.filter(exchange);
         }
 
