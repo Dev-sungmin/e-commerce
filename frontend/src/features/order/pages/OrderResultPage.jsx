@@ -19,6 +19,7 @@ export default function OrderResultPage() {
         if (authLoading) return;
 
         if (isFailRoute) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect -- URL 기반 실패
             setStatus('fail');
             setMessage(searchParams.get('message') || '결제가 취소되었습니다.');
             return;

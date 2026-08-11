@@ -11,10 +11,7 @@ export default function CartPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (items.length === 0) {
-            setProducts({});
-            return;
-        }
+        if (items.length === 0) return;
 
         async function loadProducts() {
             setIsLoadingProducts(true);

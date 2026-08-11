@@ -13,6 +13,7 @@ export default function ProductListPage() {
 
     useEffect(() => {
         void fetchProducts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page]);
 
     async function fetchProducts() {
