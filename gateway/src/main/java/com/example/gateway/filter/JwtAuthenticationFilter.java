@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -27,9 +28,14 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
+        HttpMethod method = exchange.getRequest().getMethod();
 
-        // 인증이 필요 없는 경로는 그냥 통과
-        if (path.startsWith("/api/auth") || path.startsWith("/api/products") || path.equals("/api/payments/confirm")) {
+        boolean isPublicPath = path.startsWith("/api/auth")
+                || path.startsWith("/api/products")
+                || path.equals("/api/payments/confirm")
+                || (path.startsWith("/api/reviews") && HttpMethod.GET.equals(method));
+
+        if (isPublicPath) {
             return chain.filter(exchange);
         }
 
@@ -49,11 +55,12 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
             String userId = claims.getSubject();
             String role = claims.get("role", String.class);
+            String email = claims.get("email", String.class);
 
-            // 검증된 정보를 헤더로 실어서 뒷단 서비스에 전달
             ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
                     .header("X-User-Id", userId)
                     .header("X-User-Role", role)
+                    .header("X-User-Email", email)
                     .build();
 
             return chain.filter(exchange.mutate().request(mutatedRequest).build());
@@ -70,6 +77,6 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return -1; // 다른 필터보다 먼저 실행
+        return -1;
     }
 }
