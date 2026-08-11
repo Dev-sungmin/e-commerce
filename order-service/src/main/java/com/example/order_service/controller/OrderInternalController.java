@@ -51,4 +51,14 @@ public class OrderInternalController {
         orderRepository.save(order);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/{orderId}/purchase-check")
+    public ResponseEntity<Map<String, Boolean>> checkPurchase(
+            @PathVariable String orderId,
+            @RequestParam Long userId,
+            @RequestParam Long productId
+    ) {
+        boolean purchased = orderRepository.existsPurchase(orderId, userId, productId);
+        return ResponseEntity.ok(Map.of("purchased", purchased));
+    }
 }

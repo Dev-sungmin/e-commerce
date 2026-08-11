@@ -3,6 +3,8 @@ package com.example.order_service.repository;
 import com.example.order_service.domain.Order;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +19,10 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @EntityGraph(attributePaths = "items")
     Optional<Order> findWithItemsById(String id);
 
+    @Query("SELECT CASE WHEN COUNT(o) > 0 THEN true ELSE false END " +
+            "FROM Order o JOIN o.items i " +
+            "WHERE o.id = :orderId AND o.userId = :userId AND i.productId = :productId AND o.status = 'PAID'")
+    boolean existsPurchase(@Param("orderId") String orderId,
+                           @Param("userId") Long userId,
+                           @Param("productId") Long productId);
 }
