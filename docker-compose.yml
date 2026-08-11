@@ -26,6 +26,7 @@ services:
       DB_USERNAME: ${USER_SERVICE_DB_USERNAME}
       DB_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
+      SPRING_PROFILES_ACTIVE: local
     ports:
       - "8080:8080"
     depends_on:

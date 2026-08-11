@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { productApi } from '../api/productApi';
-import { useAuth } from '../../user/hooks/useAuth';
 import '../styles/products.css';
 
 export default function ProductListPage() {
-    const { user, logout } = useAuth();
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -15,6 +13,7 @@ export default function ProductListPage() {
 
     useEffect(() => {
         void fetchProducts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [page]);
 
     async function fetchProducts() {
@@ -42,21 +41,6 @@ export default function ProductListPage() {
 
     return (
         <div>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px' }}>
-                <h1 style={{ fontSize: 18, margin: 0 }}>쇼핑몰</h1>
-                {user ? (
-                    <div>
-                        <span>{user.email}님</span>
-                        <button onClick={logout} style={{ marginLeft: 12 }}>로그아웃</button>
-                    </div>
-                ) : (
-                    <div>
-                        <Link to="/login">로그인</Link>
-                        <Link to="/signup" style={{ marginLeft: 12 }}>회원가입</Link>
-                    </div>
-                )}
-            </header>
-
             <form onSubmit={handleSearch} style={{ padding: '0 24px', display: 'flex', gap: 8 }}>
                 <input
                     value={keyword}
@@ -100,9 +84,6 @@ export default function ProductListPage() {
                                 <div style={{ padding: 16 }}>
                                     <p style={{ fontWeight: 600, margin: '0 0 6px' }}>{p.name}</p>
                                     <p style={{ margin: '0 0 6px' }}>{p.price.toLocaleString()}원</p>
-                                    <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
-                                        재고 {p.stockQuantity}개
-                                    </p>
                                 </div>
                             </div>
                         </Link>

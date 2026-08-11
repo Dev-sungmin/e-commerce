@@ -37,12 +37,13 @@ function fetchSingleProduct(PDO $pdo, int $id): void
 function fetchProductList(PDO $pdo): void
 {
     $page = max(1, (int)($_GET['page'] ?? 1));
-    $size = min(100, max(1, (int)($_GET['size'] ?? 20))); // 최대 100건으로 방어
+    $size = min(100, max(1, (int)($_GET['size'] ?? 20)));
     $offset = ($page - 1) * $size;
 
     $keyword = $_GET['keyword'] ?? null;
     $minPrice = isset($_GET['minPrice']) ? (int)$_GET['minPrice'] : null;
     $maxPrice = isset($_GET['maxPrice']) ? (int)$_GET['maxPrice'] : null;
+    $idsParam = $_GET['ids'] ?? null;
 
     $where = [];
     $params = [];
@@ -59,15 +60,21 @@ function fetchProductList(PDO $pdo): void
         $where[] = "price <= ?";
         $params[] = $maxPrice;
     }
+    if ($idsParam !== null) {
+        $ids = array_values(array_filter(array_map('intval', explode(',', $idsParam))));
+        if (count($ids) > 0) {
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $where[] = "id IN ({$placeholders})";
+            $params = array_merge($params, $ids);
+        }
+    }
 
     $whereClause = count($where) > 0 ? "WHERE " . implode(" AND ", $where) : "";
 
-    // 총 개수 조회
     $countStmt = $pdo->prepare("SELECT COUNT(*) FROM inventory {$whereClause}");
     $countStmt->execute($params);
     $total = (int)$countStmt->fetchColumn();
 
-    // 목록 조회 (LIMIT/OFFSET은 bindValue로 정수 타입 강제)
     $stmt = $pdo->prepare(
         "SELECT id, name, price, stock_quantity, image_url FROM inventory {$whereClause} ORDER BY id LIMIT ? OFFSET ?"
     );

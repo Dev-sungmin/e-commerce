@@ -1,19 +1,24 @@
 import axios from 'axios';
 
 const client = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE,  // 이제 Gateway 주소
+    baseURL: import.meta.env.VITE_API_BASE,
     withCredentials: true,
 });
 
 let accessToken = null;
-let onLogout = null;
+let logoutCallbacks = [];
+let refreshCallbacks = [];
 
 export function setAccessToken(token) {
     accessToken = token;
 }
 
-export function setOnLogout(callback) {
-    onLogout = callback;
+export function addOnLogout(callback) {
+    logoutCallbacks.push(callback);
+}
+
+export function addOnRefresh(callback) {
+    refreshCallbacks.push(callback);
 }
 
 client.interceptors.request.use((config) => {
@@ -37,11 +42,12 @@ client.interceptors.response.use(
             try {
                 const res = await client.post('/api/auth/refresh', {}, { withCredentials: true });
                 setAccessToken(res.data.accessToken);
+                refreshCallbacks.forEach((cb) => cb(res.data.accessToken));
                 original.headers.Authorization = `Bearer ${res.data.accessToken}`;
                 return client(original);
             } catch (refreshError) {
                 setAccessToken(null);
-                if (onLogout) onLogout();
+                logoutCallbacks.forEach((cb) => cb());
                 return Promise.reject(refreshError);
             }
         }
