@@ -125,6 +125,7 @@ services:
     environment:
       MONGO_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/review_db?authSource=admin
       ORDER_BASE_URL: http://order-service:8081
+      AWS_REGION: ap-northeast-2
     ports:
       - "8084:8084"
     depends_on:
