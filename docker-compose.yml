@@ -42,6 +42,7 @@ services:
       DB_NAME: legacy_shop
       DB_USERNAME: legacy_shop_service
       DB_PASSWORD: ${LEGACY_SHOP_DB_PASSWORD}
+      REVIEW_SERVICE_BASE_URL: http://review-service:8084
     ports:
       - "8090:80"
     depends_on:

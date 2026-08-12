@@ -31,7 +31,12 @@ function fetchSingleProduct(PDO $pdo, int $id): void
         return;
     }
 
-    echo json_encode(toCamelCase($product), JSON_UNESCAPED_UNICODE);
+    $result = toCamelCase($product);
+    $summary = fetchReviewSummary($id);
+    $result['averageRating'] = $summary['averageRating'];
+    $result['reviewCount'] = $summary['reviewCount'];
+
+    echo json_encode($result, JSON_UNESCAPED_UNICODE);
 }
 
 function fetchProductList(PDO $pdo): void
@@ -87,13 +92,84 @@ function fetchProductList(PDO $pdo): void
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    $productList = array_map('toCamelCase', $products);
+    $productIds = array_column($productList, 'id');
+    $summaries = fetchReviewSummaries($productIds);
+
+    foreach ($productList as &$product) {
+        $summary = $summaries[$product['id']] ?? ['averageRating' => 0, 'reviewCount' => 0];
+        $product['averageRating'] = $summary['averageRating'];
+        $product['reviewCount'] = $summary['reviewCount'];
+    }
+    unset($product);
+
     echo json_encode([
-        'products' => array_map('toCamelCase', $products),
+        'products' => $productList,
         'page' => $page,
         'size' => $size,
         'total' => $total,
         'totalPages' => (int)ceil($total / $size),
     ], JSON_UNESCAPED_UNICODE);
+}
+
+function fetchReviewSummary(int $productId): array
+{
+    $url = getReviewServiceBaseUrl() . "/api/reviews/summary?productId={$productId}";
+    $response = callReviewService($url);
+
+    if ($response === null) {
+        return ['averageRating' => 0, 'reviewCount' => 0];
+    }
+    return $response;
+}
+
+function fetchReviewSummaries(array $productIds): array
+{
+    if (empty($productIds)) {
+        return [];
+    }
+
+    $idsParam = implode(',', $productIds);
+    $url = getReviewServiceBaseUrl() . "/api/reviews/summary/batch?productIds={$idsParam}";
+    $response = callReviewService($url);
+
+    if ($response === null) {
+        return [];
+    }
+
+    $summaries = [];
+    foreach ($response as $item) {
+        $summaries[$item['productId']] = [
+            'averageRating' => $item['averageRating'],
+            'reviewCount' => $item['reviewCount'],
+        ];
+    }
+    return $summaries;
+}
+
+function callReviewService(string $url): ?array
+{
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    if ($error || $httpCode !== 200) {
+        error_log("Review Service 호출 실패: {$url}, error={$error}, httpCode={$httpCode}");
+        return null;
+    }
+
+    return json_decode($response, true);
+}
+
+function getReviewServiceBaseUrl(): string
+{
+    return getenv('REVIEW_SERVICE_BASE_URL') ?: 'http://review-service:8084';
 }
 
 function toCamelCase(array $row): array
