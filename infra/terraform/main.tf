@@ -82,4 +82,22 @@ resource "aws_instance" "app_server" {
   tags = {
     Name = "e-commerce-app-server"
   }
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
+}
+
+resource "aws_iam_role_policy" "s3_review_upload_policy" {
+  name = "e-commerce-s3-review-upload-policy"
+  role = aws_iam_role.ssm_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["s3:PutObject"]
+      Resource = "${aws_s3_bucket.review_images.arn}/*"
+    }]
+  })
 }

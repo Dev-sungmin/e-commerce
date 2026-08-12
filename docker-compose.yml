@@ -75,6 +75,7 @@ services:
       - order-service
       - cart-service
       - payment-service
+      - review-service
 
   redis:
     image: redis:7-alpine
@@ -115,6 +116,39 @@ services:
       mysql:
         condition: service_healthy
 
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: review_db
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  review-service:
+    build:
+      context: .
+      dockerfile: review-service/Dockerfile
+    environment:
+      MONGO_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/review_db?authSource=admin
+      ORDER_BASE_URL: http://order-service:8081
+      AWS_REGION: ap-northeast-2
+    volumes:
+      - ~/.aws:/root/.aws:ro
+    ports:
+      - "8084:8084"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
 volumes:
   mysql-data:
   redis-data:
+  mongo-data:

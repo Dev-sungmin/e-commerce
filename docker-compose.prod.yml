@@ -30,6 +30,7 @@ services:
       - order-service
       - cart-service
       - payment-service
+      - review-service
 
   user-service:
     image: ${ECR_REGISTRY}/e-commerce-user-service:latest
@@ -103,6 +104,35 @@ services:
       mysql:
         condition: service_healthy
 
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: review_db
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  review-service:
+    image: ${ECR_REGISTRY}/e-commerce-review-service:latest
+    environment:
+      MONGO_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/review_db?authSource=admin
+      ORDER_BASE_URL: http://order-service:8081
+      AWS_REGION: ap-northeast-2
+    ports:
+      - "8084:8084"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
 volumes:
   mysql-data:
   redis-data:
+  mongo-data:

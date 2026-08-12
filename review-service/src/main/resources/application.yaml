@@ -1,3 +1,17 @@
+server:
+  port: 8084
+
 spring:
   application:
     name: review-service
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://root:root@localhost:27017/review_db?authSource=admin}
+
+order:
+  base-url: ${ORDER_BASE_URL:http://order-service:8081}
+
+aws:
+  s3:
+    review-bucket: ${S3_REVIEW_BUCKET:e-commerce-review-images-sungmin2026}
+    region: ${AWS_REGION:ap-northeast-2}
