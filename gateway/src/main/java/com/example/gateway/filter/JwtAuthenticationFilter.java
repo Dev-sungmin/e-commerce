@@ -30,17 +30,22 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         String path = exchange.getRequest().getURI().getPath();
         HttpMethod method = exchange.getRequest().getMethod();
 
+        boolean isOptionalAuthPath = path.startsWith("/api/reviews") && HttpMethod.GET.equals(method);
+
         boolean isPublicPath = path.startsWith("/api/auth")
                 || path.startsWith("/api/products")
-                || path.equals("/api/payments/confirm")
-                || (path.startsWith("/api/reviews") && HttpMethod.GET.equals(method));
+                || path.equals("/api/payments/confirm");
 
         if (isPublicPath) {
             return chain.filter(exchange);
         }
 
         String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            if (isOptionalAuthPath) {
+                return chain.filter(exchange);
+            }
             return unauthorized(exchange);
         }
 
@@ -66,6 +71,9 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange.mutate().request(mutatedRequest).build());
 
         } catch (Exception e) {
+            if (isOptionalAuthPath) {
+                return chain.filter(exchange);
+            }
             return unauthorized(exchange);
         }
     }
