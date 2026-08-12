@@ -10,3 +10,8 @@ spring:
 
 order:
   base-url: ${ORDER_BASE_URL:http://order-service:8081}
+
+aws:
+  s3:
+    review-bucket: ${S3_REVIEW_BUCKET:e-commerce-review-images-sungmin2026}
+    region: ${AWS_REGION:ap-northeast-2}
