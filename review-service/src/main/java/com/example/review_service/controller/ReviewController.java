@@ -80,4 +80,14 @@ public class ReviewController {
     public ResponseEntity<List<ProductReviewSummary>> getSummaries(@RequestParam List<Long> productIds) {
         return ResponseEntity.ok(reviewService.getReviewSummaries(productIds));
     }
+
+    @GetMapping("/by-order")
+    public ResponseEntity<ReviewResponse> getReviewByOrder(
+            @RequestParam String orderId,
+            @RequestParam Long productId,
+            @RequestHeader(value = "X-User-Id", required = false) Long userId
+    ) {
+        ReviewResponse response = reviewService.getReviewByOrder(orderId, productId, userId);
+        return ResponseEntity.ok(response);
+    }
 }
