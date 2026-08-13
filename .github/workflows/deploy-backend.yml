@@ -24,9 +24,11 @@ jobs:
             --parameters 'commands=[
               "cd /home/ssm-user/e-commerce",
               "git pull origin main",
+              "export ECR_REGISTRY=${{ secrets.ECR_REGISTRY }}",
+              "export $(aws ssm get-parameters-by-path --path /e-commerce/prod --with-decryption --query \"Parameters[*].[Name,Value]\" --output text | awk -F\"\\t\" \"{n=split(\\$1,a,\\\"/\\\"); print a[n]\\\"=\\\"\\$2}\")",
               "aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | sudo docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
-              "sudo docker compose -f docker-compose.prod.yml pull",
-              "sudo docker compose -f docker-compose.prod.yml up -d"
+              "sudo -E docker compose -f docker-compose.prod.yml pull",
+              "sudo -E docker compose -f docker-compose.prod.yml up -d"
             ]' \
             --query "Command.CommandId" --output text)
           echo "command_id=$COMMAND_ID" >> $GITHUB_OUTPUT
