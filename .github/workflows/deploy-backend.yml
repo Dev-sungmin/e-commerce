@@ -24,6 +24,7 @@ jobs:
             --parameters 'commands=[
               "sudo git config --system --add safe.directory /home/ssm-user/e-commerce",
               "cd /home/ssm-user/e-commerce",
+              "git remote set-url origin https://${{ secrets.GH_PAT }}@github.com/Dev-sungmin/e-commerce.git",
               "git pull origin main",
               "export ECR_REGISTRY=${{ secrets.ECR_REGISTRY }}",
               "export $(aws ssm get-parameters-by-path --path /e-commerce/prod --with-decryption --query \"Parameters[*].[Name,Value]\" --output text | awk -F\"\\t\" \"{n=split(\\$1,a,\\\"/\\\"); print a[n]\\\"=\\\"\\$2}\")",
