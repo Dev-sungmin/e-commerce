@@ -6,23 +6,8 @@ import '../styles/orderList.css';
 
 export default function OrderListPage() {
     const [orders, setOrders] = useState([]);
-    const [reviewMap, setReviewMap] = useState({}); // `${orderId}_${productId}` -> reviewId
+    const [reviewMap, setReviewMap] = useState({});
     const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        loadOrders();
-    }, []);
-
-    async function loadOrders() {
-        setIsLoading(true);
-        try {
-            const res = await orderApi.getMyOrders();
-            setOrders(res.data);
-            await loadReviewStatuses(res.data);
-        } finally {
-            setIsLoading(false);
-        }
-    }
 
     async function loadReviewStatuses(orderList) {
         const paidItems = orderList
@@ -43,6 +28,23 @@ export default function OrderListPage() {
         });
         setReviewMap(map);
     }
+
+    async function loadOrders() {
+        setIsLoading(true);
+        try {
+            const res = await orderApi.getMyOrders();
+            setOrders(res.data);
+            await loadReviewStatuses(res.data);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadOrders();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     if (isLoading) return <div className="order-list-page">불러오는 중...</div>;
 
