@@ -19,6 +19,7 @@ export default function Header() {
                         {totalQuantity > 0 && <span className="cart-badge">{totalQuantity}</span>}
                     </Link>
                 )}
+                {user && <Link to="/orders">주문내역</Link>}
                 {user ? (
                     <>
                         <span>{user.email}님</span>
