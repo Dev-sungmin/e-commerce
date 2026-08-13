@@ -1,0 +1,92 @@
+.order-list-page {
+    padding: 32px;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.order-list-page h2 {
+    font-size: 22px;
+    margin: 0 0 24px;
+}
+
+.order-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.order-card {
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    padding: 16px;
+    background: var(--surface);
+}
+
+.order-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.order-status {
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.order-status-paid {
+    background: rgba(34, 197, 94, 0.12);
+    color: #16a34a;
+}
+
+.order-status-pending {
+    background: rgba(234, 179, 8, 0.12);
+    color: #ca8a04;
+}
+
+.order-status-cancelled {
+    background: var(--surface-hover);
+    color: var(--text-muted);
+}
+
+.order-card-items {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.order-card-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.order-card-item a {
+    font-size: 13px;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.order-card-item a:hover {
+    text-decoration: underline;
+}
+
+.order-card-total {
+    text-align: right;
+    font-weight: 700;
+    margin: 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--surface-border);
+}
