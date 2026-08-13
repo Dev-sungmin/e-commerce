@@ -1,0 +1,59 @@
+.review-form-page {
+    padding: 32px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.review-form-page h2 {
+    font-size: 20px;
+    margin: 0 0 20px;
+}
+
+.rating-selector {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.rating-selector .star {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: var(--surface-border);
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.rating-selector .star.filled {
+    color: #fbbf24;
+}
+
+.review-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+}
+
+.review-form-page input[type="file"] {
+    display: block;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+
+.review-form-error {
+    color: var(--error, #e5484d);
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.review-form-page .auth-button {
+    width: 100%;
+}
