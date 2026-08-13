@@ -3,6 +3,10 @@ locals {
     "user-service",
     "gateway",
     "php-legacy",
+    "order-service",
+    "payment-service",
+    "cart-service",
+    "review-service",
   ]
 }
 

@@ -106,7 +106,7 @@ jobs:
 
   push-images:
     runs-on: ubuntu-latest
-    needs: [build-backend, build-php]
+    needs: [ build-backend, build-php ]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
@@ -135,3 +135,23 @@ jobs:
         run: |
           docker build -f php-legacy/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-php-legacy:latest .
           docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-php-legacy:latest
+
+      - name: Build and push order-service
+        run: |
+          docker build -f order-service/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-order-service:latest .
+          docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-order-service:latest
+
+      - name: Build and push payment-service
+        run: |
+          docker build -f payment-service/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-payment-service:latest .
+          docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-payment-service:latest
+
+      - name: Build and push cart-service
+        run: |
+          docker build -f cart-service/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-cart-service:latest .
+          docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-cart-service:latest
+
+      - name: Build and push review-service
+        run: |
+          docker build -f review-service/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-review-service:latest .
+          docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-review-service:latest
