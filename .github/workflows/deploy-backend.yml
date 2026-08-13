@@ -22,6 +22,7 @@ jobs:
             --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
             --parameters 'commands=[
+              "git config --global --add safe.directory /home/ssm-user/e-commerce",
               "cd /home/ssm-user/e-commerce",
               "git pull origin main",
               "export ECR_REGISTRY=${{ secrets.ECR_REGISTRY }}",
