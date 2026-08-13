@@ -4,6 +4,7 @@ import { productApi } from '../api/productApi';
 import { useAuth } from '../../user/hooks/useAuth';
 import { useCart } from '../../cart/hooks/useCart';
 import '../styles/products.css';
+import ReviewList from '../../review/components/ReviewList';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -77,6 +78,9 @@ export default function ProductDetailPage() {
             {product.imageUrl && <img src={product.imageUrl} alt={product.name} />}
             <h2>{product.name}</h2>
             <p className="product-detail-price">{product.price.toLocaleString()}원</p>
+            <p className="product-detail-rating">
+                ★ {product.averageRating.toFixed(1)} ({product.reviewCount}개 리뷰)
+            </p>
 
             {isOutOfStock ? (
                 <p className="product-detail-stock">품절된 상품입니다</p>
@@ -106,6 +110,8 @@ export default function ProductDetailPage() {
                     주문하기
                 </button>
             </div>
+
+            <ReviewList productId={product.id} />
         </div>
     );
 }
