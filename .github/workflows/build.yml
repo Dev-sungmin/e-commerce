@@ -111,7 +111,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check changed services
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            user-service:
+              - 'user-service/**'
+            gateway:
+              - 'gateway/**'
+            php-legacy:
+              - 'php-legacy/**'
+            order-service:
+              - 'order-service/**'
+            payment-service:
+              - 'payment-service/**'
+            cart-service:
+              - 'cart-service/**'
+            review-service:
+              - 'review-service/**'
+
       - name: Configure AWS credentials
+        if: steps.changes.outputs.user-service == 'true' || steps.changes.outputs.gateway == 'true' || steps.changes.outputs.php-legacy == 'true' || steps.changes.outputs.order-service == 'true' || steps.changes.outputs.payment-service == 'true' || steps.changes.outputs.cart-service == 'true' || steps.changes.outputs.review-service == 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -119,39 +140,47 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login to ECR
+        if: steps.changes.outputs.user-service == 'true' || steps.changes.outputs.gateway == 'true' || steps.changes.outputs.php-legacy == 'true' || steps.changes.outputs.order-service == 'true' || steps.changes.outputs.payment-service == 'true' || steps.changes.outputs.cart-service == 'true' || steps.changes.outputs.review-service == 'true'
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push user-service
+        if: steps.changes.outputs.user-service == 'true'
         run: |
           docker build -f user-service/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-user-service:latest .
           docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-user-service:latest
 
       - name: Build and push gateway
+        if: steps.changes.outputs.gateway == 'true'
         run: |
           docker build -f gateway/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-gateway:latest .
           docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-gateway:latest
 
       - name: Build and push php-legacy
+        if: steps.changes.outputs.php-legacy == 'true'
         run: |
           docker build -f php-legacy/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-php-legacy:latest .
           docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-php-legacy:latest
 
       - name: Build and push order-service
+        if: steps.changes.outputs.order-service == 'true'
         run: |
           docker build -f order-service/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-order-service:latest .
           docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-order-service:latest
 
       - name: Build and push payment-service
+        if: steps.changes.outputs.payment-service == 'true'
         run: |
           docker build -f payment-service/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-payment-service:latest .
           docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-payment-service:latest
 
       - name: Build and push cart-service
+        if: steps.changes.outputs.cart-service == 'true'
         run: |
           docker build -f cart-service/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-cart-service:latest .
           docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-cart-service:latest
 
       - name: Build and push review-service
+        if: steps.changes.outputs.review-service == 'true'
         run: |
           docker build -f review-service/Dockerfile -t ${{ secrets.ECR_REGISTRY }}/e-commerce-review-service:latest .
           docker push ${{ secrets.ECR_REGISTRY }}/e-commerce-review-service:latest
