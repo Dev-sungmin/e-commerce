@@ -1,31 +1,45 @@
 name: Deploy Frontend
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
     branches: [main]
-    paths:
-      - 'frontend/**'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check frontend path
+        id: check
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+
       - name: Set up Node
+        if: steps.check.outputs.frontend == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install dependencies
+        if: steps.check.outputs.frontend == 'true'
         working-directory: frontend
         run: npm ci
 
       - name: Build
+        if: steps.check.outputs.frontend == 'true'
         working-directory: frontend
         run: npm run build
 
       - name: Configure AWS credentials
+        if: steps.check.outputs.frontend == 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -33,9 +47,11 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Deploy to S3
+        if: steps.check.outputs.frontend == 'true'
         run: |
           aws s3 sync frontend/dist s3://${{ secrets.S3_FRONTEND_BUCKET }} --delete
 
       - name: Invalidate CloudFront cache
+        if: steps.check.outputs.frontend == 'true'
         run: |
           aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
