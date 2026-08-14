@@ -73,7 +73,7 @@ resource "aws_security_group" "app_sg" {
 
 resource "aws_instance" "app_server" {
   ami = data.aws_ami.amazon_linux.id
-  instance_type = "t3.small"
+  instance_type = "m7i-flex.large"
   vpc_security_group_ids = [aws_security_group.app_sg.id]
   iam_instance_profile = aws_iam_instance_profile.ssm_profile.name
 
@@ -86,6 +86,19 @@ resource "aws_instance" "app_server" {
   lifecycle {
     ignore_changes = [ami]
   }
+}
+
+resource "aws_eip" "app_server" {
+  instance = aws_instance.app_server.id
+  domain   = "vpc"
+
+  tags = {
+    Name = "e-commerce-app-eip"
+  }
+}
+
+output "elastic_ip" {
+  value = aws_eip.app_server.public_ip
 }
 
 resource "aws_iam_role_policy" "s3_review_upload_policy" {
