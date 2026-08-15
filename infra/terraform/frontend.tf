@@ -1,3 +1,21 @@
+resource "aws_acm_certificate" "frontend" {
+  provider          = aws.us_east_1
+  domain_name       = var.domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+output "frontend_acm_validation_record" {
+  value = {
+    name  = tolist(aws_acm_certificate.frontend.domain_validation_options)[0].resource_record_name
+    type  = tolist(aws_acm_certificate.frontend.domain_validation_options)[0].resource_record_type
+    value = tolist(aws_acm_certificate.frontend.domain_validation_options)[0].resource_record_value
+  }
+}
+
 resource "aws_s3_bucket" "frontend" {
   bucket = "e-commerce-frontend-sungmin2026"
 }
@@ -53,6 +71,7 @@ resource "aws_cloudfront_distribution" "frontend" {
 
   enabled             = true
   default_root_object = "index.html"
+  aliases             = [var.domain_name]
 
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD"]
@@ -81,7 +100,9 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn      = aws_acm_certificate.frontend.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 }
 
