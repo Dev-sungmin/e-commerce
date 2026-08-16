@@ -15,3 +15,15 @@ aws:
   s3:
     review-bucket: ${S3_REVIEW_BUCKET:e-commerce-review-images-sungmin2026}
     region: ${AWS_REGION:ap-northeast-2}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus, metrics
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}

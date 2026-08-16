@@ -33,3 +33,15 @@ resilience4j:
         max-concurrent-calls: 20
         max-wait-duration: 2s
     order: 1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus, metrics
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}

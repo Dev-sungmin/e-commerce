@@ -19,3 +19,15 @@ toss:
 
 order:
   base-url: ${ORDER_BASE_URL:http://order-service:8081}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus, metrics
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
