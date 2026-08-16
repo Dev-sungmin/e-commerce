@@ -39,3 +39,15 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET:local-dev-secret-change-me-must-be-long-enough}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus, metrics
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}

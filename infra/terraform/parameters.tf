@@ -58,6 +58,11 @@ variable "mongo_root_password" {
   sensitive = true
 }
 
+variable "grafana_admin_password" {
+  type      = string
+  sensitive = true
+}
+
 locals {
   parameters = {
     MYSQL_ROOT_PASSWORD          = var.mysql_root_password
@@ -72,6 +77,7 @@ locals {
     JWT_SECRET                   = var.jwt_secret
     MONGO_ROOT_USERNAME          = var.mongo_root_username
     MONGO_ROOT_PASSWORD          = var.mongo_root_password
+    GRAFANA_ADMIN_PASSWORD = var.grafana_admin_password
   }
 }
 
