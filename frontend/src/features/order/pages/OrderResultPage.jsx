@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useLocation, Link } from 'react-router-dom';
 import { paymentApi } from '../api/paymentApi.js';
+import { orderApi } from '../api/orderApi.js';
 import { useCart } from '../../cart/hooks/useCart';
 import { useAuth } from '../../user/hooks/useAuth';
 import '../styles/orderResult.css';
@@ -18,15 +19,22 @@ export default function OrderResultPage() {
     useEffect(() => {
         if (authLoading) return;
 
+        const orderId = searchParams.get('orderId');
+
         if (isFailRoute) {
             // eslint-disable-next-line react-hooks/set-state-in-effect -- URL 기반 실패
             setStatus('fail');
             setMessage(searchParams.get('message') || '결제가 취소되었습니다.');
+
+            if (orderId) {
+                orderApi.cancelOrder(orderId).catch(() => {
+                    // 취소 API 실패는 화면에 별도로 안 알림 (재고는 타임아웃으로도 복구되니 치명적이지 않음)
+                });
+            }
             return;
         }
 
         const paymentKey = searchParams.get('paymentKey');
-        const orderId = searchParams.get('orderId');
         const amount = searchParams.get('amount');
 
         if (!paymentKey || !orderId || !amount) {
@@ -42,11 +50,14 @@ export default function OrderResultPage() {
                 try {
                     await clearCart();
                 } catch {
-                    // 카트 비우기 실패는 결제 성공 여부에 영향 없음 (세션 만료 등으로 실패할 수 있음)
+                    // 카트 비우기 실패는 결제 성공 여부에 영향 없음
                 }
             } catch {
                 setStatus('fail');
                 setMessage('결제 승인에 실패했습니다.');
+                orderApi.cancelOrder(orderId).catch(() => {
+                    // 취소 API 실패는 화면에 별도로 안 알림
+                });
             }
         }
 
