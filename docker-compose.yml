@@ -56,11 +56,15 @@ services:
     environment:
       DB_USERNAME: ${ORDER_SERVICE_DB_USERNAME}
       DB_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     ports:
       - "8081:8081"
     depends_on:
       mysql:
         condition: service_healthy
+      rabbitmq:
+        condition: service_started
 
   gateway:
     build:
@@ -181,9 +185,21 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     privileged: true
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
 volumes:
   mysql-data:
   redis-data:
   mongo-data:
   prometheus-data:
   grafana-data:
+  rabbitmq-data:

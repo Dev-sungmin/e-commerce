@@ -11,6 +11,7 @@ import com.example.order_service.exception.InsufficientStockException;
 import com.example.order_service.exception.InvalidOrderStateException;
 import com.example.order_service.exception.OrderAccessDeniedException;
 import com.example.order_service.exception.OrderNotFoundException;
+import com.example.order_service.messaging.OrderTimeoutPublisher;
 import com.example.order_service.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +26,13 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final InventoryClient inventoryClient;
+    private final OrderTimeoutPublisher orderTimeoutPublisher;
 
-    public OrderService(OrderRepository orderRepository, InventoryClient inventoryClient) {
+    public OrderService(OrderRepository orderRepository, InventoryClient inventoryClient,
+                        OrderTimeoutPublisher orderTimeoutPublisher) {
         this.orderRepository = orderRepository;
         this.inventoryClient = inventoryClient;
+        this.orderTimeoutPublisher = orderTimeoutPublisher;
     }
 
     @Transactional
@@ -58,6 +62,8 @@ public class OrderService {
         }
 
         orderRepository.save(order);
+
+        orderTimeoutPublisher.scheduleTimeout(orderId);
 
         return order;
     }

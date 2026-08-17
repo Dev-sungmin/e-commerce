@@ -6,6 +6,7 @@ import { useAuth } from '../../user/hooks/useAuth';
 import '../styles/checkout.css';
 
 const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY;
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 export default function CheckoutPage() {
     const location = useLocation();
@@ -29,12 +30,20 @@ export default function CheckoutPage() {
         setError('');
         setIsSubmitting(true);
         let createdOrderId = null;
+        let eventSource = null;
         try {
             const orderRes = await orderApi.createOrder(
                 items.map((item) => ({ productId: item.productId, quantity: item.quantity }))
             );
             const { id: orderId, totalAmount, items: orderItems } = orderRes.data;
             createdOrderId = orderId;
+
+            eventSource = new EventSource(`${API_BASE}/api/orders/${orderId}/events`);
+            eventSource.addEventListener('cancelled', () => {
+                eventSource.close();
+                alert('결제 시간이 만료되어 주문이 취소되었습니다.');
+                window.location.href = '/orders';
+            });
 
             const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY);
             const payment = tossPayments.payment({ customerKey: `user_${user.id}` });
@@ -52,16 +61,17 @@ export default function CheckoutPage() {
                 successUrl: window.location.origin + '/order/success',
                 failUrl: window.location.origin + `/order/fail?orderId=${orderId}`,
             });
+
+            eventSource.close();
         } catch (err) {
+            if (eventSource) eventSource.close();
             console.error('결제 처리 오류:', err);
             if (err.response?.status === 409) {
                 setError('재고가 부족한 상품이 있습니다.');
             } else if (err.code === 'USER_CANCEL') {
                 setError('결제가 취소되었습니다.');
                 if (createdOrderId) {
-                    orderApi.cancelOrder(createdOrderId).catch(() => {
-                        // 취소 API 실패는 조용히 무시, 타임아웃 로직이 백업
-                    });
+                    orderApi.cancelOrder(createdOrderId).catch(() => {});
                 }
             } else {
                 setError('주문 처리 중 오류가 발생했습니다.');

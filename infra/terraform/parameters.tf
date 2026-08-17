@@ -63,6 +63,15 @@ variable "grafana_admin_password" {
   sensitive = true
 }
 
+variable "rabbitmq_user" {
+  type      = string
+  sensitive = true
+}
+variable "rabbitmq_password" {
+  type      = string
+  sensitive = true
+}
+
 locals {
   parameters = {
     MYSQL_ROOT_PASSWORD          = var.mysql_root_password
@@ -78,6 +87,8 @@ locals {
     MONGO_ROOT_USERNAME          = var.mongo_root_username
     MONGO_ROOT_PASSWORD          = var.mongo_root_password
     GRAFANA_ADMIN_PASSWORD = var.grafana_admin_password
+    RABBITMQ_USER     = var.rabbitmq_user
+    RABBITMQ_PASSWORD = var.rabbitmq_password
   }
 }
 

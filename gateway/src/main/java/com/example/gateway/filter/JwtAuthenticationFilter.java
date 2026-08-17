@@ -34,7 +34,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
         boolean isPublicPath = path.startsWith("/api/auth")
                 || path.startsWith("/api/products")
-                || path.equals("/api/payments/confirm");
+                || path.equals("/api/payments/confirm")
+                || path.matches("/api/orders/[^/]+/events");
 
         if (isPublicPath) {
             return chain.filter(exchange);
