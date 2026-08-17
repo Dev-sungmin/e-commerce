@@ -3,11 +3,14 @@ package com.example.order_service.controller;
 import com.example.order_service.domain.Order;
 import com.example.order_service.dto.CreateOrderRequest;
 import com.example.order_service.dto.OrderResponse;
+import com.example.order_service.messaging.OrderEventEmitterRegistry;
 import com.example.order_service.repository.OrderRepository;
 import com.example.order_service.service.OrderService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 import java.util.Map;
@@ -19,10 +22,13 @@ public class OrderController {
 
     private final OrderService orderService;
     private final OrderRepository orderRepository;
+    private final OrderEventEmitterRegistry orderEventEmitterRegistry;
 
-    public OrderController(OrderService orderService, OrderRepository orderRepository) {
+    public OrderController(OrderService orderService, OrderRepository orderRepository,
+                           OrderEventEmitterRegistry orderEventEmitterRegistry) {
         this.orderService = orderService;
         this.orderRepository = orderRepository;
+        this.orderEventEmitterRegistry = orderEventEmitterRegistry;
     }
 
     @PostMapping
@@ -60,5 +66,10 @@ public class OrderController {
     ) {
         orderService.cancelOrder(id, userId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/{id}/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribeOrderEvents(@PathVariable String id) {
+        return orderEventEmitterRegistry.register(id);
     }
 }
