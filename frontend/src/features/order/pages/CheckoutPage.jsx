@@ -28,11 +28,13 @@ export default function CheckoutPage() {
     async function handlePayment() {
         setError('');
         setIsSubmitting(true);
+        let createdOrderId = null;
         try {
             const orderRes = await orderApi.createOrder(
                 items.map((item) => ({ productId: item.productId, quantity: item.quantity }))
             );
             const { id: orderId, totalAmount, items: orderItems } = orderRes.data;
+            createdOrderId = orderId;
 
             const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY);
             const payment = tossPayments.payment({ customerKey: `user_${user.id}` });
@@ -48,7 +50,7 @@ export default function CheckoutPage() {
                 orderId,
                 orderName,
                 successUrl: window.location.origin + '/order/success',
-                failUrl: window.location.origin + '/order/fail',
+                failUrl: window.location.origin + `/order/fail?orderId=${orderId}`,
             });
         } catch (err) {
             console.error('결제 처리 오류:', err);
@@ -56,6 +58,11 @@ export default function CheckoutPage() {
                 setError('재고가 부족한 상품이 있습니다.');
             } else if (err.code === 'USER_CANCEL') {
                 setError('결제가 취소되었습니다.');
+                if (createdOrderId) {
+                    orderApi.cancelOrder(createdOrderId).catch(() => {
+                        // 취소 API 실패는 조용히 무시, 타임아웃 로직이 백업
+                    });
+                }
             } else {
                 setError('주문 처리 중 오류가 발생했습니다.');
             }

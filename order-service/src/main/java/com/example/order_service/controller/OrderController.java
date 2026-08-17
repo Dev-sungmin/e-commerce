@@ -52,4 +52,13 @@ public class OrderController {
         List<OrderResponse> response = orders.stream().map(OrderResponse::from).toList();
         return ResponseEntity.ok(response);
     }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancelOrder(
+            @PathVariable String id,
+            @RequestHeader("X-User-Id") Long userId
+    ) {
+        orderService.cancelOrder(id, userId);
+        return ResponseEntity.ok().build();
+    }
 }
