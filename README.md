@@ -9,19 +9,19 @@ MSA 환경에서 재고 동시성 제어,
 Demo</span></summary>
 <br>
 <span>인증</span>
-<video src="https://github.com/user-attachments/assets/6bd3b957-45db-47fe-9394-4aa2c93666d4" controls width="100%"></video>
+<video src="https://github.com/user-attachments/assets/1789b2df-79ee-467b-b819-f5981ed4990f" controls width="100%"></video>
 <br>
 
 <span>쇼핑</span>
-<video src="https://github.com/user-attachments/assets/64743da2-2ed5-47e5-a7d3-7a70ca8ca084" controls width="100%"></video>
+<video src="https://github.com/user-attachments/assets/fea2b296-5552-4616-998d-c3ef53b2ae60" controls width="100%"></video>
 <br>
 
 <span>구매</span>
-<video src="https://github.com/user-attachments/assets/7a9155da-8909-4f6b-9baa-9d9b9b1b4348" controls width="100%"></video>
+<video src="https://github.com/user-attachments/assets/8a0c0f4d-a102-4a74-971d-48a44c4f816a" controls width="100%"></video>
 <br>
 
 <span>리뷰</span>
-<video src="https://github.com/user-attachments/assets/ba7dd3b0-af44-4519-a8f0-5d14817be23f" controls width="100%"></video>
+<video src="https://github.com/user-attachments/assets/d12fde47-f61c-45e2-a44d-16af650f592f" controls width="100%"></video>
 <br>
 
 </details>
@@ -86,7 +86,7 @@ Why PHP?</span></summary>
 <details>
 <summary><span style="font-size: 1.5em; font-weight: bold; cursor: pointer;">Key Technical Highlights</span></summary>
 <br>
-→ 결제 방지/이탈 시 비동기 재고 복구<br>
+→ 결제 방치/이탈 시 비동기 재고 복구<br>
 → N + 1 문제 개선<br>
 → 리뷰서비스 API 성능 개선<br>
 → Circuit Breaker 장애 격리<br>
