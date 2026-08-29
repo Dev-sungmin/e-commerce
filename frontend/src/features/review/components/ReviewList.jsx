@@ -50,7 +50,13 @@ export default function ReviewList({ productId }) {
             } else {
                 await reviewApi.likeReview(review.id);
             }
-            await loadReviews();
+            setReviews((prev) =>
+                prev.map((r) =>
+                    r.id === review.id
+                        ? { ...r, likedByMe: !r.likedByMe, likeCount: r.likeCount + (r.likedByMe ? -1 : 1) }
+                        : r
+                )
+            );
         } catch {
             // 좋아요 실패는 조용히 무시 (UX 상 치명적이지 않음)
         }
