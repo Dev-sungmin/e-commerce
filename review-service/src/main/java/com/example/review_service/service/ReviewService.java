@@ -2,19 +2,18 @@ package com.example.review_service.service;
 
 import com.example.review_service.client.OrderClient;
 import com.example.review_service.domain.Review;
-import com.example.review_service.dto.CreateReviewRequest;
-import com.example.review_service.dto.ProductReviewSummary;
-import com.example.review_service.dto.ReviewResponse;
-import com.example.review_service.dto.ReviewSummary;
+import com.example.review_service.dto.*;
 import com.example.review_service.exception.DuplicateReviewException;
 import com.example.review_service.exception.NotPurchasedException;
 import com.example.review_service.exception.ReviewNotFoundException;
 import com.example.review_service.repository.ReviewLikeRepository;
 import com.example.review_service.repository.ReviewRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -56,13 +55,22 @@ public class ReviewService {
         return ReviewResponse.from(saved, false);
     }
 
-    public Page<ReviewResponse> getReviewsByProduct(Long productId, Pageable pageable, Long requesterId) {
-        Page<Review> reviews = reviewRepository.findByProductIdOrderByCreatedAtDesc(productId, pageable);
-        return reviews.map(review -> {
-            boolean likedByMe = requesterId != null
-                    && reviewLikeRepository.existsByReviewIdAndUserId(review.getId(), requesterId);
-            return ReviewResponse.from(review, likedByMe);
-        });
+    public ReviewListResponse getReviewsByProduct(Long productId, LocalDateTime cursor, int size, Long requesterId) {
+        Pageable limit = PageRequest.of(0, size + 1);
+
+        List<Review> reviews = (cursor == null)
+                ? reviewRepository.findByProductIdOrderByCreatedAtDesc(productId, limit)
+                : reviewRepository.findByProductIdAndCreatedAtLessThanOrderByCreatedAtDesc(productId, cursor, limit);
+
+        List<ReviewResponse> responses = reviews.stream()
+                .map(review -> {
+                    boolean likedByMe = requesterId != null
+                            && reviewLikeRepository.existsByReviewIdAndUserId(review.getId(), requesterId);
+                    return ReviewResponse.from(review, likedByMe);
+                })
+                .toList();
+
+        return ReviewListResponse.of(responses, size);
     }
 
     public void likeReview(String reviewId, Long userId) {
