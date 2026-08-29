@@ -13,17 +13,6 @@ export default function ReviewList({ productId }) {
     const [pageIndex, setPageIndex] = useState(0);
     const [hasNext, setHasNext] = useState(false);
 
-    useEffect(() => {
-        loadReviews();
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- productId, pageIndex 변경 시에만 재조회
-    }, [productId, pageIndex]);
-
-    useEffect(() => {
-        if (!location.hash || reviews.length === 0) return;
-        const el = document.getElementById(location.hash.slice(1));
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, [reviews, location.hash]);
-
     async function loadReviews() {
         setIsLoading(true);
         try {
@@ -42,6 +31,18 @@ export default function ReviewList({ productId }) {
         }
     }
 
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- productId/pageIndex 변경 시 서버 데이터를 다시 불러오는 정상적인 패턴
+        loadReviews();
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- productId, pageIndex 변경 시에만 재조회
+    }, [productId, pageIndex]);
+
+    useEffect(() => {
+        if (!location.hash || reviews.length === 0) return;
+        const el = document.getElementById(location.hash.slice(1));
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, [reviews, location.hash]);
+
     async function handleToggleLike(review) {
         if (!user) return;
         try {
@@ -50,7 +51,13 @@ export default function ReviewList({ productId }) {
             } else {
                 await reviewApi.likeReview(review.id);
             }
-            await loadReviews();
+            setReviews((prev) =>
+                prev.map((r) =>
+                    r.id === review.id
+                        ? { ...r, likedByMe: !r.likedByMe, likeCount: r.likeCount + (r.likedByMe ? -1 : 1) }
+                        : r
+                )
+            );
         } catch {
             // 좋아요 실패는 조용히 무시 (UX 상 치명적이지 않음)
         }
