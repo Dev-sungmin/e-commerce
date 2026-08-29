@@ -14,12 +14,6 @@ export default function ReviewList({ productId }) {
     const [hasNext, setHasNext] = useState(false);
 
     useEffect(() => {
-        setCursorStack([null]);
-        setPageIndex(0);
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- productId 변경 시 페이지네이션 초기화
-    }, [productId]);
-
-    useEffect(() => {
         loadReviews();
         // eslint-disable-next-line react-hooks/exhaustive-deps -- productId, pageIndex 변경 시에만 재조회
     }, [productId, pageIndex]);

@@ -111,7 +111,7 @@ export default function ProductDetailPage() {
                 </button>
             </div>
 
-            <ReviewList productId={product.id} />
+            <ReviewList key={id} productId={product.id} />
         </div>
     );
 }
