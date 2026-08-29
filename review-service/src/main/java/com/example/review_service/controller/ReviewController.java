@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -35,15 +36,13 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ReviewResponse>> getReviews(
+    public ResponseEntity<ReviewListResponse> getReviews(
             @RequestParam Long productId,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) LocalDateTime cursor,
             @RequestParam(defaultValue = "10") int size,
             @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
-        System.out.println("=== getReviews userId: " + userId + " ===");
-        Pageable pageable = PageRequest.of(page, size);
-        Page<ReviewResponse> reviews = reviewService.getReviewsByProduct(productId, pageable, userId);
+        ReviewListResponse reviews = reviewService.getReviewsByProduct(productId, cursor, size, userId);
         return ResponseEntity.ok(reviews);
     }
 
