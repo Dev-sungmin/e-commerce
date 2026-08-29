@@ -9,13 +9,20 @@ export default function ReviewList({ productId }) {
     const location = useLocation();
     const [reviews, setReviews] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [page, setPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
+    const [cursorStack, setCursorStack] = useState([null]);
+    const [pageIndex, setPageIndex] = useState(0);
+    const [hasNext, setHasNext] = useState(false);
+
+    useEffect(() => {
+        setCursorStack([null]);
+        setPageIndex(0);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- productId 변경 시 페이지네이션 초기화
+    }, [productId]);
 
     useEffect(() => {
         loadReviews();
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- productId, page 변경 시에만 재조회
-    }, [productId, page]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- productId, pageIndex 변경 시에만 재조회
+    }, [productId, pageIndex]);
 
     useEffect(() => {
         if (!location.hash || reviews.length === 0) return;
@@ -26,9 +33,16 @@ export default function ReviewList({ productId }) {
     async function loadReviews() {
         setIsLoading(true);
         try {
-            const res = await reviewApi.getReviews(productId, page, 10);
-            setReviews(res.data.content);
-            setTotalPages(res.data.totalPages);
+            const cursor = cursorStack[pageIndex];
+            const res = await reviewApi.getReviews(productId, cursor, 10);
+            setReviews(res.data.reviews);
+            setHasNext(res.data.hasNext);
+            setCursorStack((prev) => {
+                if (res.data.hasNext && prev.length === pageIndex + 1) {
+                    return [...prev, res.data.nextCursor];
+                }
+                return prev;
+            });
         } finally {
             setIsLoading(false);
         }
@@ -82,11 +96,11 @@ export default function ReviewList({ productId }) {
                     </div>
                 </div>
             ))}
-            {totalPages > 1 && (
+            {(pageIndex > 0 || hasNext) && (
                 <div className="review-pagination">
-                    <button disabled={page <= 0} onClick={() => setPage(page - 1)}>이전</button>
-                    <span>{page + 1} / {totalPages}</span>
-                    <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>다음</button>
+                    <button disabled={pageIndex <= 0} onClick={() => setPageIndex(pageIndex - 1)}>이전</button>
+                    <span>{pageIndex + 1} 페이지</span>
+                    <button disabled={!hasNext} onClick={() => setPageIndex(pageIndex + 1)}>다음</button>
                 </div>
             )}
         </div>

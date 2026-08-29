@@ -1,8 +1,8 @@
 import client from '../../../api/client.js';
 
 export const reviewApi = {
-    getReviews: (productId, page = 0, size = 10) =>
-        client.get('/api/reviews', { params: { productId, page, size } }),
+    getReviews: (productId, cursor, size = 10) =>
+        client.get('/api/reviews', { params: { productId, cursor, size } }),
     createReview: (data) => client.post('/api/reviews', data),
     likeReview: (reviewId) => client.post(`/api/reviews/${reviewId}/like`),
     unlikeReview: (reviewId) => client.delete(`/api/reviews/${reviewId}/like`),
