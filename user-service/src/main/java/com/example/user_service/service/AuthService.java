@@ -57,7 +57,7 @@ public class AuthService {
 
     @Transactional
     public TokenResponse refresh(String refreshTokenValue) {
-        RefreshToken stored  = refreshTokenRepository.findByToken(refreshTokenValue)
+        RefreshToken stored = refreshTokenRepository.findByToken(refreshTokenValue)
                 .orElseThrow(InvalidRefreshTokenException::new);
 
         if (stored.isExpired()) {
@@ -68,8 +68,8 @@ public class AuthService {
         User user = userRepository.findById(stored.getUserId())
                 .orElseThrow(InvalidRefreshTokenException::new);
 
-        refreshTokenRepository.delete(stored);
-        return issueTokens(user);
+        String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(), user.getRole());
+        return new TokenResponse(accessToken, refreshTokenValue);
     }
 
     @Transactional
@@ -90,5 +90,4 @@ public class AuthService {
 
         return new TokenResponse(accessToken, refreshTokenValue);
     }
-
 }
