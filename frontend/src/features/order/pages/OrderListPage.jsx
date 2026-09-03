@@ -17,7 +17,7 @@ export default function OrderListPage() {
         const results = await Promise.all(
             paidItems.map(({ orderId, productId }) =>
                 reviewApi.getReviewByOrder(orderId, productId)
-                    .then((res) => ({ key: `${orderId}_${productId}`, reviewId: res.data.id }))
+                    .then((res) => (res.data.exists ? { key: `${orderId}_${productId}`, reviewId: res.data.review.id } : null))
                     .catch(() => null)
             )
         );
