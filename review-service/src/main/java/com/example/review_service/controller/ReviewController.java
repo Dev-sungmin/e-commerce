@@ -81,12 +81,12 @@ public class ReviewController {
     }
 
     @GetMapping("/by-order")
-    public ResponseEntity<ReviewResponse> getReviewByOrder(
+    public ResponseEntity<ReviewExistsResponse> getReviewByOrder(
             @RequestParam String orderId,
             @RequestParam Long productId,
             @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
-        ReviewResponse response = reviewService.getReviewByOrder(orderId, productId, userId);
+        ReviewExistsResponse response = reviewService.getReviewByOrder(orderId, productId, userId);
         return ResponseEntity.ok(response);
     }
 }
