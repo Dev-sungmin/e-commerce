@@ -108,13 +108,14 @@ public class ReviewService {
         return reviewRepository.getReviewSummaries(productIds);
     }
 
-    public ReviewResponse getReviewByOrder(String orderId, Long productId, Long requesterId) {
-        Review review = reviewRepository.findByOrderIdAndProductId(orderId, productId)
-                .orElseThrow(() -> new ReviewNotFoundException("작성된 리뷰가 없습니다"));
-
-        boolean likedByMe = requesterId != null
-                && reviewLikeRepository.existsByReviewIdAndUserId(review.getId(), requesterId);
-        return ReviewResponse.from(review, likedByMe);
+    public ReviewExistsResponse getReviewByOrder(String orderId, Long productId, Long requesterId) {
+        return reviewRepository.findByOrderIdAndProductId(orderId, productId)
+                .map(review -> {
+                    boolean likedByMe = requesterId != null
+                            && reviewLikeRepository.existsByReviewIdAndUserId(review.getId(), requesterId);
+                    return new ReviewExistsResponse(true, ReviewResponse.from(review, likedByMe));
+                })
+                .orElse(new ReviewExistsResponse(false, null));
     }
 
 }
