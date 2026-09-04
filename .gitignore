@@ -35,3 +35,6 @@ Thumbs.db
 .terraform.lock.hcl
 crash.log
 *.tfvars
+
+infra/k8s/secrets.yaml
+infra/terraform-eks/eks-policy.json
