@@ -21,3 +21,7 @@ output "redis_endpoint" {
 output "nat_eip" {
   value = aws_eip.nat.public_ip
 }
+
+output "external_secrets_role_arn" {
+  value = aws_iam_role.external_secrets.arn
+}

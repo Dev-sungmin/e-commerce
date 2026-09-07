@@ -38,3 +38,7 @@ crash.log
 
 infra/k8s/secrets.yaml
 infra/terraform-eks/eks-policy.json
+
+infra/terraform-eks/rds-init.sql
+
+infra/k8s/eso-service-account.yaml
