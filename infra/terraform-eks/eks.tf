@@ -70,8 +70,12 @@ resource "aws_eks_node_group" "main" {
   node_role_arn   = aws_iam_role.eks_node_role.arn
   subnet_ids      = aws_subnet.private[*].id
 
-  ami_type       = "AL2023_x86_64_STANDARD"
-  instance_types = ["m7i-flex.large"]
+  ami_type = "AL2023_x86_64_STANDARD"
+
+  launch_template {
+    id      = aws_launch_template.eks_nodes.id
+    version = "$Latest"
+  }
 
   scaling_config {
     desired_size = 2
@@ -132,4 +136,27 @@ resource "aws_iam_role_policy" "external_secrets_ssm" {
       ]
     }]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_csi_policy" {
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
+
+resource "aws_launch_template" "eks_nodes" {
+  name_prefix   = "e-commerce-eks-node-"
+  instance_type = "m7i-flex.large"
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+  }
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name = "e-commerce-eks-node"
+    }
+  }
 }
