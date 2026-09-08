@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: review-service
+  namespace: e-commerce
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: review-service
+  template:
+    metadata:
+      labels:
+        app: review-service
+    spec:
+      containers:
+        - name: review-service
+          image: 384668480652.dkr.ecr.ap-northeast-2.amazonaws.com/e-commerce-review-service:latest
+          ports:
+            - containerPort: 8084
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: MONGO_URI
+            - name: ORDER_BASE_URL
+              value: "http://order-service:8081"
+            - name: AWS_REGION
+              value: "ap-northeast-2"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
