@@ -4,22 +4,10 @@ server:
 spring:
   application:
     name: order-service
-  datasource:
-    url: jdbc:mysql://mysql:3306/new_order
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:root}
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: true
-  rabbitmq:
-    host: rabbitmq
-    port: 5672
-    username: ${RABBITMQ_USER}
-    password: ${RABBITMQ_PASSWORD}
-
-php:
-  base-url: ${PHP_BASE_URL:http://php-legacy:80}
 
 resilience4j:
   circuitbreaker:
