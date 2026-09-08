@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-legacy
+  namespace: e-commerce
+spec:
+  selector:
+    app: php-legacy
+  ports:
+    - port: 8090
+      targetPort: 80

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-legacy
+  namespace: e-commerce
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: php-legacy
+  template:
+    metadata:
+      labels:
+        app: php-legacy
+    spec:
+      containers:
+        - name: php-legacy
+          image: 384668480652.dkr.ecr.ap-northeast-2.amazonaws.com/e-commerce-php-legacy:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: MYSQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: MYSQL_HOST
+            - name: DB_HOST
+              value: "$(MYSQL_HOST)"
+            - name: DB_NAME
+              value: "legacy_shop"
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: LEGACY_SHOP_DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: LEGACY_SHOP_DB_PASSWORD
+            - name: REVIEW_SERVICE_BASE_URL
+              value: "http://review-service:8084"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"

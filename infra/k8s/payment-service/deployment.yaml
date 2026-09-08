@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: e-commerce
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: 384668480652.dkr.ecr.ap-northeast-2.amazonaws.com/e-commerce-payment-service:latest
+          ports:
+            - containerPort: 8083
+          env:
+            - name: MYSQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: MYSQL_HOST
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: PAYMENT_SERVICE_DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: PAYMENT_SERVICE_DB_PASSWORD
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://$(MYSQL_HOST):3306/new_payment"
+            - name: TOSS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: TOSS_SECRET_KEY
+            - name: ORDER_BASE_URL
+              value: "http://order-service:8081"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
