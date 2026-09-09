@@ -38,7 +38,7 @@ services:
       DB_USERNAME: ${USER_SERVICE_DB_USERNAME}
       DB_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: dev
     ports:
       - "8080:8080"
     depends_on:
@@ -90,6 +90,7 @@ services:
   cart-service:
     image: ${ECR_REGISTRY}/e-commerce-cart-service:latest
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       REDIS_HOST: redis
       REDIS_PORT: 6379
     ports:
@@ -101,6 +102,7 @@ services:
   payment-service:
     image: ${ECR_REGISTRY}/e-commerce-payment-service:latest
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       DB_USERNAME: ${PAYMENT_SERVICE_DB_USERNAME}
       DB_PASSWORD: ${PAYMENT_SERVICE_DB_PASSWORD}
       TOSS_SECRET_KEY: ${TOSS_SECRET_KEY}
@@ -129,6 +131,7 @@ services:
   review-service:
     image: ${ECR_REGISTRY}/e-commerce-review-service:latest
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       MONGO_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/review_db?authSource=admin
       ORDER_BASE_URL: http://order-service:8081
       AWS_REGION: ap-northeast-2

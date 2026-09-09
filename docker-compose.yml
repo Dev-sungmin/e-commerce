@@ -100,6 +100,7 @@ services:
       context: .
       dockerfile: cart-service/Dockerfile
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       REDIS_HOST: redis
       REDIS_PORT: 6379
     ports:
@@ -113,6 +114,7 @@ services:
       context: .
       dockerfile: payment-service/Dockerfile
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       DB_USERNAME: ${PAYMENT_SERVICE_DB_USERNAME}
       DB_PASSWORD: ${PAYMENT_SERVICE_DB_PASSWORD}
       TOSS_SECRET_KEY: ${TOSS_SECRET_KEY}
@@ -143,6 +145,7 @@ services:
       context: .
       dockerfile: review-service/Dockerfile
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       MONGO_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/review_db?authSource=admin
       ORDER_BASE_URL: http://order-service:8081
       AWS_REGION: ap-northeast-2
