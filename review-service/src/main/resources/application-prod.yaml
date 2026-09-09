@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+
+order:
+  base-url: ${ORDER_BASE_URL}

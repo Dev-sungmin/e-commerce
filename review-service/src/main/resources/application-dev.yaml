@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://root:root@mongodb:27017/review_db?authSource=admin}
+
+order:
+  base-url: ${ORDER_BASE_URL:http://order-service:8081}
