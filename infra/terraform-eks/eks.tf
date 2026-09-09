@@ -1,4 +1,5 @@
-# EKS 클러스터가 AWS 리소스를 관리하기 위한 IAM Role
+
+# EKS ?대윭?ㅽ꽣媛 AWS 由ъ냼?ㅻ? 愿由ы븯湲??꾪븳 IAM Role
 resource "aws_iam_role" "eks_cluster_role" {
   name = "e-commerce-eks-cluster-role"
 
@@ -19,7 +20,7 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
-# EKS 클러스터 (Control Plane)
+# EKS ?대윭?ㅽ꽣 (Control Plane)
 resource "aws_eks_cluster" "main" {
   name     = "e-commerce-eks"
   role_arn = aws_iam_role.eks_cluster_role.arn
@@ -32,7 +33,7 @@ resource "aws_eks_cluster" "main" {
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
 }
 
-# 워커 노드가 클러스터에 합류하기 위한 IAM Role
+# ?뚯빱 ?몃뱶媛 ?대윭?ㅽ꽣???⑸쪟?섍린 ?꾪븳 IAM Role
 resource "aws_iam_role" "eks_node_role" {
   name = "e-commerce-eks-node-role"
 
@@ -63,7 +64,7 @@ resource "aws_iam_role_policy_attachment" "eks_ecr_readonly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
-# 노드 그룹 (워커 노드 - 프라이빗 서브넷에 배치)
+# ?몃뱶 洹몃９ (?뚯빱 ?몃뱶 - ?꾨씪?대퉿 ?쒕툕?룹뿉 諛곗튂)
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "e-commerce-node-group"
@@ -159,4 +160,11 @@ resource "aws_launch_template" "eks_nodes" {
       Name = "e-commerce-eks-node"
     }
   }
+}
+
+resource "aws_eks_addon" "ebs_csi" {
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "aws-ebs-csi-driver"
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
 }
