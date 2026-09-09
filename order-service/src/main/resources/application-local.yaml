@@ -1,6 +1,8 @@
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/new_order
+  rabbitmq:
+    host: localhost
 
 php:
   base-url: http://localhost:8090

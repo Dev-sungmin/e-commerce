@@ -19,6 +19,8 @@ spec:
           ports:
             - containerPort: 8082
           env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
             - name: REDIS_HOST
               valueFrom:
                 secretKeyRef:

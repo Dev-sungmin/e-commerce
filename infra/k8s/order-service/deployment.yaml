@@ -19,6 +19,8 @@ spec:
           ports:
             - containerPort: 8081
           env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
             - name: MYSQL_HOST
               valueFrom:
                 secretKeyRef:
@@ -34,8 +36,6 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: ORDER_SERVICE_DB_PASSWORD
-            - name: SPRING_DATASOURCE_URL
-              value: "jdbc:mysql://$(MYSQL_HOST):3306/new_order"
             - name: PHP_BASE_URL
               value: "http://php-legacy:8090"
             - name: RABBITMQ_HOST
