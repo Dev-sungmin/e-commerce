@@ -38,7 +38,7 @@ spec:
                   key: ORDER_SERVICE_DB_PASSWORD
             - name: PHP_BASE_URL
               value: "http://php-legacy:8090"
-            - name: RABBITMQ_HOST
+            - name: MQ_HOST
               value: "rabbitmq"
             - name: RABBITMQ_USER
               valueFrom:
