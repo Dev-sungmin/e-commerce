@@ -1,0 +1,28 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://user-service:8080
+          predicates:
+            - Path=/api/auth/**
+        - id: product-service
+          uri: http://php-legacy:8090
+          predicates:
+            - Path=/api/products.php
+        - id: order-service
+          uri: http://order-service:8081
+          predicates:
+            - Path=/api/orders/**
+        - id: cart-service
+          uri: http://cart-service:8082
+          predicates:
+            - Path=/api/cart/**
+        - id: payment-service
+          uri: http://payment-service:8083
+          predicates:
+            - Path=/api/payments/**
+        - id: review-service
+          uri: http://review-service:8084
+          predicates:
+            - Path=/api/reviews/**
