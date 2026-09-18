@@ -21,6 +21,7 @@ services:
   gateway:
     image: ${ECR_REGISTRY}/e-commerce-gateway:latest
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8000:8000"
