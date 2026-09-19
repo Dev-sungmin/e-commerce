@@ -87,10 +87,10 @@ Why PHP?</span></summary>
 <summary><span style="font-size: 1.5em; font-weight: bold; cursor: pointer;">Key Technical Highlights</span></summary>
 <br>
 → 결제 방치/이탈 시 비동기 재고 복구<br>
+→ 원자적 연산 기반 동시성 제어<br>
 → N + 1 문제 개선<br>
 → 리뷰서비스 API 성능 개선<br>
 → Circuit Breaker 장애 격리<br>
-→ 원자적 연산 기반 동시성 제어<br>
 → 가격 조작 취약점 문제 개선<br>
 
 </details>
@@ -111,9 +111,25 @@ Why PHP?</span></summary>
 <details>
 <summary><span style="font-size: 1.5em; font-weight: bold; cursor: pointer;">Infrastructure</span></summary>
 <br>
-→ EC2 단일 인스턴스 + Docker Compose로 전체 서비스 임시 운영<br>
-→ Caddy로 HTTPS 자동 처리(Let's Encrypt), CloudFront+S3로 프론트엔드 정적 호스팅<br>
-→ Terraform으로 인프라 전체 코드화
+→ EC2 + Docker Compose(dev)와 EKS(prod) 두 환경을 병행 운영, 서비스 도메인은 EKS로 전환 완료<br>
+→ EKS: VPC(퍼블릭/프라이빗/DB 서브넷 이중화), 관리형 DB(RDS/ElastiCache/MongoDB Atlas), RabbitMQ(StatefulSet)<br>
+→ IRSA로 External Secrets Operator/ALB Controller에 최소 권한 부여, SSM Parameter Store를 K8s Secret으로 자동 동기화<br>
+→ AWS Load Balancer Controller + Ingress로 외부 노출<br>
+→ Terraform으로 인프라(VPC/EKS/RDS/IAM)와 클러스터 애드온(ESO, ALB Controller)까지 코드화, apply/destroy로 전체 환경 재현<br>
+→ Caddy로 HTTPS 자동 처리(Let's Encrypt, dev), CloudFront+S3로 프론트엔드 정적 호스팅
+
+</details>
+
+<br>
+
+<details>
+<summary><span style="font-size: 1.5em; font-weight: bold; cursor: pointer;">EKS deploy details</span></summary>
+<br>
+→ MySQL/Redis는 데이터 유실 방지를 위해 관리형(RDS/ElastiCache)으로, MongoDB는 DocumentDB 대비 비용 효율을 고려해 Atlas(M0)로, RabbitMQ는 관리형(Amazon MQ) 대비 시간/비용 제약을 고려해 StatefulSet으로 — 데이터 중요도와 비용을 저울질해 저장소별로 다른 방식 선택<br>
+→ 컨테이너 이름 기반(mysql, rabbitmq 등) 하드코딩된 연결 설정을, local/dev/prod 3단계 Spring Profile로 분리해 환경별 명시적 설정 강제<br>
+→ Kubernetes가 Service 이름과 동일하게 자동 주입하는 환경변수(RABBITMQ_PORT 등)와의 충돌을 발견하고 명명 규칙으로 해결<br>
+→ db.t3.micro의 낮은 max_connections를 여러 서비스가 동시에 소진하는 문제를 HikariCP 풀 크기 제한으로 완화<br>
+→ ALB 헬스체크 기본 경로(/) 대신 /actuator/health를 지정해 Target unhealthy 문제 해결
 
 </details>
 
@@ -122,8 +138,7 @@ Why PHP?</span></summary>
 <details>
 <summary><span style="font-size: 1.5em; font-weight: bold; cursor: pointer;"> Future Work</span></summary>
 <br>
-→ product-service를 Spring Boot로 마이그레이션 (무중단 트래픽 전환)<br>
-→ EKS 전환
+→ product-service를 Spring Boot로 마이그레이션 (무중단 트래픽 전환)
 
 </details>
 
