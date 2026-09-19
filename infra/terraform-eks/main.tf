@@ -8,6 +8,18 @@ terraform {
         source = "hashicorp/tls"
         version = "~> 4.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.30"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.13"
+    }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "~> 1.14"
+    }
   }
 }
 
@@ -37,7 +49,6 @@ resource "aws_internet_gateway" "eks_igw" {
   }
 }
 
-# 퍼블릭 서브넷 2개 (서로 다른 AZ) - ALB/NAT Gateway용
 resource "aws_subnet" "public" {
   count                   = 2
   vpc_id                  = aws_vpc.eks_vpc.id
@@ -52,7 +63,6 @@ resource "aws_subnet" "public" {
   }
 }
 
-# 프라이빗 서브넷 2개 - 워커 노드용
 resource "aws_subnet" "private" {
   count             = 2
   vpc_id            = aws_vpc.eks_vpc.id
@@ -131,7 +141,6 @@ resource "aws_subnet" "database" {
   }
 }
 
-# DB 서브넷은 외부와 통신할 필요가 없음 - 라우트 테이블에 인터넷 경로 없음
 resource "aws_route_table" "database" {
   vpc_id = aws_vpc.eks_vpc.id
 
